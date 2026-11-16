@@ -47,6 +47,20 @@ LIGHT = dict(bg="#EDF1F9", bg2="#F7F9FE", card="#FFFFFF", card2="#F0F4FC", line=
              ink="#0B1526", sub="#5A6B8C", cyan="#00A8C4", blue="#2563EB", violet="#7C3AED",
              magenta="#DB2777", green="#059669", amber="#B45309", orange="#EA580C",
              red="#DC2626", atext="#007E96", good_ink="#FFFFFF")
+EMERALD = dict(bg="#040B08", bg2="#08130E", card="#0B1A13", card2="#10251B", line="#1D3A2B",
+               ink="#E6F5EC", sub="#8AA89A", cyan="#2DE2A6", blue="#22C1D6", violet="#7BD88F",
+               magenta="#C5E86C", green="#4ADE80", amber="#FFC247", orange="#FB8C3C",
+               red="#FF5A64", atext="#6CF2C2", good_ink="#02110A")
+AURORA = dict(bg="#0A0614", bg2="#110A22", card="#170E2E", card2="#1F1440", line="#35235F",
+              ink="#F1EBFF", sub="#A394C9", cyan="#B07CFF", blue="#6D7BFF", violet="#8B5CF6",
+              magenta="#FF4FCB", green="#3DDBA0", amber="#FFB84D", orange="#FF7E5A",
+              red="#FF4D6D", atext="#D0B3FF", good_ink="#12061F")
+EMBER = dict(bg="#0D0805", bg2="#160E09", card="#1E130C", card2="#291A10", line="#4A3020",
+             ink="#FBEFE3", sub="#B59A82", cyan="#FFB020", blue="#FF8A3D", violet="#F2683C",
+             magenta="#FF4D5E", green="#7ED957", amber="#FFD166", orange="#FB7A3C",
+             red="#FF4D5E", atext="#FFCB6B", good_ink="#1A0D02")
+THEMES = {"🌌 Midnight": DARK, "☀️ Daylight": LIGHT, "🌿 Emerald": EMERALD,
+          "🔮 Aurora": AURORA, "🔥 Ember": EMBER}
 T = DARK  # active theme, refreshed each run
 
 PAGES = ["🛰 Overview", "🚨 Incident Queue", "✅ Approval Inbox", "🔎 Case Explorer",
@@ -1425,7 +1439,7 @@ def sidebar(eng: Engine) -> None:
         st.slider("📡 Alert volume (per min)", 2, 40, key="alert_rate")
         st.toggle("🐒 Chaos monkey (random outages)", key="chaos")
         st.toggle("🧪 Dry-run mode (no external writes)", key="dry")
-        st.toggle("☀️ Light theme", key="light")
+        st.selectbox("🎨 Theme", list(THEMES), key="theme")
         with st.container(key="killzone"):
             st.toggle("⛔ GLOBAL KILL SWITCH", key="kill")
         st.caption("INJECT DEMO SCENARIO")
@@ -1460,7 +1474,7 @@ def main() -> None:
     st.set_page_config(page_title="Self-Healing IT Operations Crew", page_icon="🛠️",
                        layout="wide", initial_sidebar_state="expanded")
     ss = st.session_state
-    defaults = dict(sim_speed=3.0, alert_rate=14, chaos=False, dry=False, light=False, kill=False,
+    defaults = dict(sim_speed=3.0, alert_rate=14, chaos=False, dry=False, theme=next(iter(THEMES)), kill=False,
                     pol_auto=0.90, pol_notify=0.70, pol_rate=6, pol_blast="service",
                     roi_inc=900, roi_sev3=55, roi_mttr=46, roi_eng=3, roi_cost=95, roi_down=40,
                     roi_nodes=400, roi_price=14, roi_auto=40, roi_red=50, nav=PAGES[0])
@@ -1476,7 +1490,7 @@ def main() -> None:
             ss.ex_case = cid
     eng: Engine = ss.eng
     global T
-    T = LIGHT if ss.light else DARK
+    T = THEMES[ss.theme]
     inject_css()
     for rb in RUNBOOKS:
         ss.setdefault(f"allow_{rb}", rb != "rb-wipe")
