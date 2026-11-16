@@ -123,6 +123,13 @@ def sha(s: str) -> str:
     return hashlib.sha256(s.encode()).hexdigest()
 
 
+def rgba(hex_color: str, alpha: float) -> str:
+    """Plotly rejects 8-digit hex (#RRGGBBAA), so convert to an rgba() string."""
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return f"rgba({r},{g},{b},{alpha})"
+
+
 def money(v: float) -> str:
     return f"${v:,.0f}"
 
@@ -948,7 +955,7 @@ def page_overview(eng: Engine, cfg: dict) -> None:
         xs = [eng.t0 + timedelta(seconds=p[0]) for p in pts]
         fig = frame(go.Figure(), 300)
         fig.add_trace(go.Scatter(x=xs, y=[p[1] for p in pts], name="error %", mode="lines",
-                                 line=dict(color=T["magenta"], width=2), fill="tozeroy", fillcolor=T["magenta"] + "22"))
+                                 line=dict(color=T["magenta"], width=2), fill="tozeroy", fillcolor=rgba(T["magenta"], 0.13)))
         fig.add_trace(go.Scatter(x=xs, y=[p[3] for p in pts], name="cart-svc RSS %", mode="lines",
                                  line=dict(color=T["violet"], width=1.6, dash="dot")))
         fig.add_trace(go.Scatter(x=xs, y=[p[2] for p in pts], name="p95 ms", mode="lines", yaxis="y2",
@@ -1152,7 +1159,7 @@ def page_explorer(eng: Engine, cfg: dict) -> None:
                          hide_index=True, height=110)
         pts = list(eng.metrics)[-120:]
         sp = frame(go.Figure(), 140)
-        sp.add_trace(go.Scatter(y=[p[1] for p in pts], mode="lines", line=dict(color=T["magenta"], width=2), fill="tozeroy", fillcolor=T["magenta"] + "22", name="error %"))
+        sp.add_trace(go.Scatter(y=[p[1] for p in pts], mode="lines", line=dict(color=T["magenta"], width=2), fill="tozeroy", fillcolor=rgba(T["magenta"], 0.13), name="error %"))
         sp.update_layout(showlegend=False, xaxis=dict(visible=False))
         chart(sp, "ex_spark")
     with t4:
